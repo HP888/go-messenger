@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	config := config.Load()
-	messenger.Listen(config.Server)
+	configuration := config.Load()
+	messenger.Listen(configuration.Server)
 }

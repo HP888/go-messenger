@@ -14,6 +14,6 @@ type Config struct {
 func Load() Config {
 	config := Config{}
 	tomlConfig, _ := toml.LoadFile("config.toml")
-	toml.Unmarshal([]byte(tomlConfig.String()), &config)
+	_ = toml.Unmarshal([]byte(tomlConfig.String()), &config)
 	return config
 }

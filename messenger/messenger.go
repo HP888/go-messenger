@@ -3,7 +3,6 @@ package messenger
 import (
 	"fmt"
 	"gomessenger/config"
-	"log"
 	"net"
 )
 
@@ -22,7 +21,7 @@ func acceptConnection(listener *net.TCPListener) {
 	for {
 		connection, err := listener.AcceptTCP()
 		if err != nil {
-			log.Fatal(err)
+			PrintErr(err)
 			continue
 		}
 
