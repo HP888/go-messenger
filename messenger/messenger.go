@@ -14,10 +14,10 @@ func Listen(config config.ServerConfig) {
 		panic(err)
 	}
 
-	acceptConnection(listener.(*net.TCPListener))
+	acceptConnections(listener.(*net.TCPListener))
 }
 
-func acceptConnection(listener *net.TCPListener) {
+func acceptConnections(listener *net.TCPListener) {
 	for {
 		connection, err := listener.AcceptTCP()
 		if err != nil {
