@@ -6,7 +6,10 @@ import (
 	"net"
 )
 
-const PREFIX = "[GoMessenger] "
+const (
+	PREFIX          = "[GoMessenger] "
+	MaxPacketLength = 32767
+)
 
 func Listen(config config.ServerConfig) {
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", config.Host, config.Port))
@@ -27,6 +30,7 @@ func acceptConnections(listener *net.TCPListener) {
 
 		handler := NewHandler(connection)
 		Println("Client has connected to the server! [" + handler.Address + "]")
+
 		go handler.Handle()
 	}
 }

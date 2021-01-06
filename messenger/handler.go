@@ -7,7 +7,7 @@ import (
 )
 
 type Handler struct {
-	PacketQueue chan []byte
+	PacketQueue chan Packet
 	Connection  *net.TCPConn
 	Element     *list.Element
 	Address     string
@@ -17,11 +17,11 @@ var handlers = list.New()
 
 func NewHandler(connection *net.TCPConn) *Handler {
 	handler := new(Handler)
-	handler.Element = handlers.PushBack(handler)
-
 	handler.Address = connection.RemoteAddr().(*net.TCPAddr).IP.String()
-	handler.PacketQueue = make(chan []byte)
+	handler.PacketQueue = make(chan Packet)
 	handler.Connection = connection
+
+	handler.Element = handlers.PushBack(handler)
 
 	return handler
 }
@@ -47,14 +47,14 @@ func (handler *Handler) Handle() {
 func (handler *Handler) ReadPackets() {
 	for {
 		reader := handler.Connection
-		bytes, err := ReadBytes(reader, 32767)
+		bytes, err := ReadBytes(reader, MaxPacketLength)
 
 		if err != nil {
-			handler.PacketQueue <- nil
+			handler.PacketQueue <- Packet{Data: []byte(""), Error: err}
 			break
 		}
 
-		handler.PacketQueue <- bytes
+		handler.PacketQueue <- Packet{Data: bytes, Error: nil}
 		// Println("Readed: " + string(bytes))
 	}
 }
@@ -65,14 +65,16 @@ func (handler *Handler) WritePackets() error {
 
 	for {
 		packet := <-packetChannel
-		if packet == nil {
-			err = fmt.Errorf("error in handler's WritePackets(): Connection closed")
+		if packet.Error != nil {
+			err = fmt.Errorf("error in handler's WritePackets(): %w", packet.Error)
 			break
 		}
 
+		bytes := packet.Data
+
 		for element := handlers.Front(); element != nil; element = element.Next() {
 			targetHandler := element.Value.(*Handler)
-			_ = WriteBytes(targetHandler.Connection, packet)
+			_ = WriteBytes(targetHandler.Connection, bytes)
 		}
 	}
 

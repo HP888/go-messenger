@@ -1,5 +1,6 @@
 package messenger
 
 type Packet struct {
-	Data []byte
+	Data  []byte
+	Error error
 }
