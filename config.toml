@@ -1,8 +1,7 @@
 #################################
-#            GoMessenger
-#          Version 0.01
+#          GoMessenger
+#          Version 0.1
 #################################
-
 
 [server]
 host = '0.0.0.0'

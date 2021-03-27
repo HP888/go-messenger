@@ -17,6 +17,10 @@ func ReadBytes(reader io.Reader, maxLength int32) ([]byte, error) {
 		return nil, err
 	}
 
+	if length < 0 {
+		return nil, fmt.Errorf("byte array smaller than 0")
+	}
+
 	if length > maxLength {
 		return nil, fmt.Errorf("byte array longer than maximum: %d > %d", length, maxLength)
 	}

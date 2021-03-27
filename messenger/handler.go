@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"fmt"
 	"net"
+	"sync"
 )
 
 type Handler struct {
@@ -11,6 +12,7 @@ type Handler struct {
 	Connection  *net.TCPConn
 	Element     *list.Element
 	Address     string
+	Mutex       sync.Mutex
 }
 
 var handlers = list.New()
@@ -55,7 +57,6 @@ func (handler *Handler) ReadPackets() {
 		}
 
 		handler.PacketQueue <- Packet{Data: bytes, Error: nil}
-		// Println("Readed: " + string(bytes))
 	}
 }
 
@@ -74,7 +75,10 @@ func (handler *Handler) WritePackets() error {
 
 		for element := handlers.Front(); element != nil; element = element.Next() {
 			targetHandler := element.Value.(*Handler)
+
+			targetHandler.Mutex.Lock()
 			_ = WriteBytes(targetHandler.Connection, bytes)
+			targetHandler.Mutex.Unlock()
 		}
 	}
 
